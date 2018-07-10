@@ -6,5 +6,5 @@ How to test the current setup (not yet for deployment, just dev):
 - [docker & docker-composed is installed](https://docs.docker.com/compose/install/)
 - 
 ```bash
-
+docker-compose up --build
 ```
