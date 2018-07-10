@@ -1,0 +1,23 @@
+version: '3'
+services: 
+  ssh_server:
+    image: ajoergensen/openssh-server
+    restart: always
+    ports: 
+      - "8716:22"
+    # volumes:
+      # - ./trustedKeys:/etc/ssh/.ssh/authorized_keys:ro
+    environment: 
+      - "APP_PASSWORD=password" #username is "app"
+
+  ssh_client:
+    build: 
+      context: .
+      dockerfile: ssh_client.dockerfile
+    links: 
+      - ssh_server
+    command: tail -f /dev/null
+
+
+
+#docker run --rm --name sshd -p 8022:22 ajoergensen/openssh-server
