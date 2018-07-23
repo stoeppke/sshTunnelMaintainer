@@ -1,0 +1,17 @@
+#!/bin/bash
+
+# generating a new password for rstricted_user and writing it to /ssh_server_pass. New instance = new password - client auth via key is permanent with compose-volume file authorized_keys_ToConnectToServerRestricted
+if [ -f  /InitialRun.sh ]
+then
+    chmod +x /InitialRun.sh && /InitialRun.sh && rm -f /InitialRun.sh
+fi
+
+set -e
+
+if [ "$1" = 'ssh-server' ]
+then
+    # starting ssh deamon and loging to stderr which will be seen in compose-log (docker-compose logs -f ssh_server)
+    /usr/sbin/sshd -De
+fi
+
+exec "$@"

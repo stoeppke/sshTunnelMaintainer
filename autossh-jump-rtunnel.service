@@ -1,0 +1,16 @@
+# found on https://gist.github.com/ntrepid8/0af12c012dd2567c800799d86eb44f90
+[Unit]
+Description=AutoSSH reverse tunnel service for  1234 -> 22
+After=network.target
+
+[Service]
+ExecStart=/usr/bin/autossh \
+    -M 0 -o "ExitOnForwardFailure=yes" \
+    -o "ServerAliveInterval 30" \
+    -o "ServerAliveCountMax 3" -N \
+    -R 1234:localhost:22 \
+    -F /root/.ssh/config \
+    ssh_server
+
+[Install]
+WantedBy=multi-user.target

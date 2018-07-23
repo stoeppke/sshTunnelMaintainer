@@ -1,0 +1,14 @@
+Port 22
+LogLevel INFO
+SyslogFacility AUTH
+
+Subsystem sftp /usr/lib/openssh/sftp-server #enable 
+
+GatewayPorts yes #needed to open -R tunnel from client to server
+
+Match User restricted_user
+    PubkeyAuthentication yes
+    PasswordAuthentication yes
+    PubkeyAuthentication yes
+    ## if client has no password but still needs to connect. Look in InitialRun.sh too
+    # PermitEmptyPasswords yes

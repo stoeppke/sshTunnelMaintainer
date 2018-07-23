@@ -1,23 +1,33 @@
-version: '3'
+version: '2'
 services: 
   ssh_server:
-    image: ajoergensen/openssh-server
-    restart: always
-    ports: 
-      - "8716:22"
-    # volumes:
-      # - ./trustedKeys:/etc/ssh/.ssh/authorized_keys:ro
-    environment: 
-      - "APP_PASSWORD=password" #username is "app"
-
-  ssh_client:
     build: 
       context: .
-      dockerfile: ssh_client.dockerfile
-    links: 
-      - ssh_server
-    command: tail -f /dev/null
-
-
-
-#docker run --rm --name sshd -p 8022:22 ajoergensen/openssh-server
+      dockerfile: ssh_server.dockerfile
+    restart: always
+    ports: 
+      # random setup port. Needs to be configured in firewall - forwarded from externel to here
+      # This one you need to give to your client while he runs your PiClientRun.sh
+      - "6523:22"
+      # 8717 enables you the connection using the ssh -R tunnel to the client. You hafe the free choice.
+      # try not to change 1234 if possible, just more work... . It is used in the autossh-jump-rtunnel.service. Unless yu care for the rest too.
+      - "8717:1234" 
+    volumes:
+      # password used for clients to enter server with "restricted_user" account
+      - ./ssh_server_pass:/ssh_server_pass
+      # put your pub-key here. Client will fetch them and register in roots authorized_keys
+      - ./MaintainersKey:/MaintainersKey:ro 
+      #already connected clients connect using key-auth. These keys a stored consistend in this local file
+      - ./authorized_keys_ToConnectToServerRestricted:/restricted/directory/.ssh/authorized_keys
+      - ./autossh-jump-rtunnel.service:/restricted/directory/autossh-jump-rtunnel.service
+      - ./sshd_config:/etc/ssh/sshd_config
+      # Switch comments if client has no password but still needs to connect. Look in InitialRun.sshd_config too
+      # - ./common-auth:/etc/pam.d/common-auth
+  script_supplyer:
+    image: httpd
+    restart: always
+    ports: 
+      # here clients curl the script to init hthe connection
+      - "6522:80"
+    volumes: 
+      - ./PiClientRun.sh:/usr/local/apache2/htdocs/PiClientRun.sh

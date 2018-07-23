@@ -1,0 +1,11 @@
+# a raspi client to test the config over distrubuted networks
+Vagrant.configure("2") do |config|
+  config.vm.box = "adampie/pi-gen"
+  config.vm.provider "virtualbox" do |vb|
+    vb.customize ["modifyvm", :id, "--memory", "512"]
+  end
+  config.vm.provision "file", source: "./autossh-jump-rtunnel.service", destination: "~/autossh-jump-rtunnel.service"
+  config.vm.provision "file", source: "./PiClientRun.sh", destination: "~/PiClientRun.sh"
+
+  config.vm.network "private_network", type: "dhcp"
+end
